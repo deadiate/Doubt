@@ -1,0 +1,117 @@
+# Install WeasyPrint version 52.5
+!pip install weasyprint==52.5
+
+import markdown
+
+from weasyprint import HTML, CSS
+from weasyprint.fonts import FontConfiguration
+
+import random
+
+novel = """
+
+# Doubt Comes In
+### by Rediate Zewdu
+
+"""
+
+for chapter in range(1,15):
+  novel += f"""
+
+##Chapter {chapter}
+
+  """
+
+  for w in range( random.randrange(30000,50000)):
+    novel += " yeah"
+    if(random.randrange(1,12) > 2):
+      novel+= random.choice([". ","? ", "... ", "! ","-- " "??? ", " so.. ", " everything is fine. ", " right???", "I'm okay "])
+    
+    if (random.randrange(1,100) < 3):
+      novel += ".\n\n"
+
+print(novel)
+
+# convert the markdown
+
+html = markdown.markdown(novel)
+
+# prepare WeasyPrint
+font_config = FontConfiguration()
+rendered_html = HTML(string=html)
+
+random.randrange(1,12)
+
+css = CSS(string='''
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;1,500&display=swap');
+
+@import url(''https://fonts.googleapis.com/css2?family=Lora:ital@1&family=Playfair+Display:ital,wght@0,400;1,500&display=swap'');
+body {
+font-family: 'Playfair Display', Lora;
+}
+
+hr {
+  break-after: recto; 
+}
+
+h1 {
+  font-size: 50pt;
+  text-align:center;
+  margin-top: 3in;
+  font-family: 'Lora',cursive;
+}
+h2{
+  break-before: recto;
+  font-family: 'Lora',cursive;
+}
+
+h3 {
+  font-size: 20pt;
+  text-align:center;
+}
+
+/* set the basic page geometry and start the incrementer */
+@page {
+  font-family: 'Playfair Display', Lora;
+  margin: 1in;
+  size: letter;
+  counter-increment: page;
+  @bottom-center {
+    content: "Doubt Comes In";
+    text-align:center;
+    font-style: italic;
+    color: #666666;
+  }
+}
+
+/* print the page number on the bottom-right of recto pages */
+@page :right {
+  @bottom-right{
+    content: "[" counter(page) "]";
+    text-align:right;
+    color: #666666;
+    visibility: invisible;
+  }
+}
+
+/* print the page number on the bottom-left of verso pages */
+@page :left {
+  @bottom-left{
+    content: "[" counter(page) "]";
+    text-align:left;
+    color: #666666;
+  }
+}
+
+/* blank the footer on the first page */
+@page:first{
+  @bottom-left {content: ""}
+  @bottom-right {content: ""}
+  @bottom-center {content: ""}
+}
+
+
+''', font_config=font_config)
+
+
+rendered_html.write_pdf('/content/doubtcomesin.pdf', stylesheets=[css],font_config=font_config)
